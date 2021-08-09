@@ -2,13 +2,12 @@ import time
 import requests
 import concurrent.futures
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup
-from src.util.settings import REQUISICOES
+from src.util.settings import SITES_WITH_USERS , MAX_THREED
 from src.infrastructure.db_factory import DBStart
 from src.infrastructure.entities import Approveds
 from src.infrastructure.repository import UserRepository
 
-MAX_THREADS = 30
+MAX_THREADS = MAX_THREED
 
 class WebScraping:
     """ Pega todos os dados do site e salva no banco de dados"""
@@ -35,7 +34,7 @@ class WebScraping:
         """
 
         inicio = time.time()
-        lista_values_sites = [x for x in range(1,REQUISICOES+1)]
+        lista_values_sites = [x for x in range(1,SITES_WITH_USERS+1)]
         base_url = 'https://sample-university-site.herokuapp.com/approvals/'
         list_urls = map(lambda x: base_url+str(x),lista_values_sites)
         threads = min(MAX_THREADS, len(lista_values_sites))
@@ -43,17 +42,6 @@ class WebScraping:
             executor.map(self.__get_all_data,list_urls)
         final = time.time()
         print(round(final-inicio,2), "segundos para ", len(lista_values_sites))
-
-    def __get_name_score(self,url):
-        """ Pega o cpf, nome e score do vestibulando cria um Approved() e inseri no banco de dado. """
-        session = self.req.get(url)
-        soup = BeautifulSoup(session.content,'html.parser')
-        divs = soup.find_all('div')
-        cpf = url.split('/')[-1]
-        name = divs[0].contents[1]
-        score= divs[1].contents[1]
-        new_data = Approveds(cpf=cpf,name=name,score=score)
-        self.db.save(new_data)
 
     def __get_all_data(self,page_espec):
         """
@@ -71,3 +59,16 @@ class WebScraping:
         threads = min(MAX_THREADS, len(urls))
         with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
             executor.map(self.__get_name_score, urls)
+
+    def __get_name_score(self,url):
+        """ Pega o cpf, nome e score do vestibulando cria um Approved() e inseri no banco de dado. """
+        session = self.req.get(url)
+        soup = BeautifulSoup(session.content,'html.parser')
+        divs = soup.find_all('div')
+        cpf = url.split('/')[-1]
+        name = divs[0].contents[1]
+        score= divs[1].contents[1]
+        new_data = Approveds(cpf=cpf,name=name,score=score)
+        self.db.save(new_data)
+
+
