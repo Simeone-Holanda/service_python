@@ -6,8 +6,8 @@
 
 ## Estratégias para acelerar o processo de captura de dados:
    * Bilioteca concurrent.futures para usar multithreading e fazer varias requisições ao mesmo tempo.
-   * Criar sessões geral para tratar todos os requests.
-   * Aumentar a quantidade threed que vai ser usado, para isso acabei tendo que definir a alguns paramentros a mais na criação da engine e sessions do sqlalchamy.
+   * Criar uma sessões de requests geral para tratar todos os requests.
+   * Aumentar a quantidade threed que vai ser usado, para isso acabei tendo que definir a alguns paramentros a mais na criação da engine e sessions do sqlalchemy.
 
 ## Prerequisites
 - <a href="https://www.apachefriends.org/pt_br/index.html"> MySQL</a> **Site do xampp**
